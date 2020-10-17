@@ -10,22 +10,10 @@
 </head>
 <body class="container">
     <header>
-        <h1>shorten your url</h1>        
+        <h1>shorten your url</h1>
+        <!-- h1>Cmon, hack me!!!</h1 -->
     </header>
     <main id="app">
-        <!-- form @submit.prevent="createUrl()">
-            <div class="form-group">
-                <label for="url">Url</label>
-                <input v-model="url" name="url" id="url">
-            </div>
-
-            <div class="form-group">
-                <label for="slug">Slug</label>
-                <input v-model="slug" name="slug" id="slug">
-            </div>
-
-            <button type="submit">Create</button>
-        </form -->
         <form @submit.prevent="createUrl()">
             <div class="form-group">
               <input v-model="url" name="url" id="url" class="form-control" placeholder="URL to shorten">

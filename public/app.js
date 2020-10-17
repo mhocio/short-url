@@ -8,6 +8,9 @@ var app = new Vue({
     },
     methods: {
         async createUrl() {
+            if (!this.useCustomSlug) {
+                this.slug = '';
+            }
             const response = await fetch('/url', {
                 method: 'POST',
                 headers: {
