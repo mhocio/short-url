@@ -50,34 +50,36 @@ app.get('/:id', async (req, res) => {
     }
 });
 
-const schema = yup.object().shape({
-    slug: yup.string().trim().matches(/[\w\-]/i),
+const urlSchema = yup.object().shape({
     url: yup.string().trim().url().required(),
-})
+});
+
+const slugSchema = yup.object().shape({
+    slug: yup.string().trim().matches(/[\w\-]/i),
+});
 
 app.post('/url', async (req, res, next) => {
     let { slug, url } = req.body;
     try {
-        await schema.validate({
-            slug,
-            url,
-        });
+        await urlSchema.validate({ url });
 
-        if (!slug) {
+        if (!slug || slug == '') {
             slug = nanoid(5);
         } 
-        else 
+        //else 
         // {
         //     const existing = await urls.findOne({ slug });
         //     if (existing)
         //         throw new Error('Slug in use.')
         // }
         slug = slug.toLowerCase();
+        await slugSchema.validate({ slug });
         const newUrl = {
             url,
             slug
         }
         const createdUrl = await urls.insert(newUrl);
+        delete createdUrl._id;
         res.json(createdUrl);
     } catch (error) {
         if (error.message.startsWith('E11000')) {
