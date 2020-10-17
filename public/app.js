@@ -4,6 +4,7 @@ var app = new Vue({
         url: '',
         slug: '',
         created: null,
+        useCustomSlug: false
     },
     methods: {
         async createUrl() {
