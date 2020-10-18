@@ -38,7 +38,7 @@
                         <div class="custom-control custom-checkbox">
                         <input class="custom-control-input" type="checkbox" id="gridCheck" v-model="useCustomSlug">
                         <label class="custom-control-label" for="gridCheck">
-                            Use custom short phrase
+                            use custom short phrase
                         </label>
                         </div>
                     </div>
@@ -53,6 +53,7 @@
                 <pre v-if="created">
                     <a v-bind:href="createdUrl"><b>{{createdUrl}}</b></a>
                 </pre>
+                <pre v-if="error" id="errorAlert">{{error}}</pre>
             </div>
         </main>
 

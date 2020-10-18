@@ -18,16 +18,16 @@ const app = express();
 //app.use(helmet());
 //app.use(helmet.contentSecurityPolicy());
 
-// app.use(helmet.dnsPrefetchControl());
-// app.use(helmet.expectCt());
-// app.use(helmet.frameguard());
-// app.use(helmet.hidePoweredBy());
-// app.use(helmet.hsts());
-// app.use(helmet.ieNoOpen());
-// app.use(helmet.noSniff());
-// app.use(helmet.permittedCrossDomainPolicies());
-// app.use(helmet.referrerPolicy());
-// app.use(helmet.xssFilter());
+app.use(helmet.dnsPrefetchControl());
+app.use(helmet.expectCt());
+app.use(helmet.frameguard());
+app.use(helmet.hidePoweredBy());
+app.use(helmet.hsts());
+app.use(helmet.ieNoOpen());
+app.use(helmet.noSniff());
+app.use(helmet.permittedCrossDomainPolicies());
+app.use(helmet.referrerPolicy());
+app.use(helmet.xssFilter());
 
 app.use(morgan('tiny'));
 app.use(cors());
@@ -43,6 +43,12 @@ app.get('/:id', async (req, res) => {
     try {
         const url = await urls.findOne({ slug });
         if (url) {
+            // urls.update({ id: url._id }, { clicks: url.clicks+1 });
+            urls.update( 
+                { _id: url._id }, 
+                { $set: { clicks: url.clicks+1 }},
+                (err, result) => {}
+            )
             res.redirect(url.url);
         }
         res.redirect(`/?error=${slug} not found`);
@@ -77,7 +83,8 @@ app.post('/url', async (req, res, next) => {
         await slugSchema.validate({ slug });
         const newUrl = {
             url,
-            slug
+            slug,
+            clicks: 0
         }
         const createdUrl = await urls.insert(newUrl);
         delete createdUrl._id;
@@ -85,6 +92,7 @@ app.post('/url', async (req, res, next) => {
     } catch (error) {
         if (error.message.startsWith('E11000')) {
             error.message = 'Slug in use.'
+            error.status = 555;
         }
         next(error);
     }

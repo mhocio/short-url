@@ -1,9 +1,9 @@
 html,
 body {
-    height: 100%;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: start;
+    margin-top: 16vh;
     width: inherit;
 }
 
@@ -28,6 +28,10 @@ header {
 #generatedLink a {
     display: block;
     text-align: center
+}
+
+#generatedLink #errorAlert {
+    color: red;
 }
 
 .custom-checkbox .custom-control-input:checked ~ .custom-control-label::before {
