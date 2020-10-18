@@ -17,6 +17,10 @@ var app = new Vue({
             if (!this.useCustomSlug) {
                 this.slug = '';
             }
+
+            if (this.useCustomSlug && this.slug == '') {
+                this.useCustomSlug = false;
+            }
             
             fetch('/url', {
                 method: 'POST',
