@@ -1,0 +1,36 @@
+html,
+body {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: inherit;
+}
+
+body {
+    background-color: #f1f1f1d0;
+}
+
+header {
+    color: #19b895ce;
+    margin-bottom: 5vh;
+}
+
+#mainForm {
+    width: fit-content;
+}
+
+#generatedLink {
+    margin-top: 2vh;
+    text-align: center;
+}
+
+#generatedLink a {
+    display: block;
+    text-align: center
+}
+
+.custom-checkbox .custom-control-input:checked ~ .custom-control-label::before {
+    border-color: #3a3a3ace;
+    background-color: #3a3a3ace;
+  }

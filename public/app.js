@@ -4,7 +4,8 @@ var app = new Vue({
         url: '',
         slug: '',
         created: null,
-        useCustomSlug: false
+        useCustomSlug: false,
+        createdUrl: null,
     },
     methods: {
         async createUrl() {
@@ -23,6 +24,8 @@ var app = new Vue({
             });
 
             this.created = await response.json();
+            this.createdUrl = location.protocol + '//' + location.host + '/' + this.created.slug;
+            console.log(this.createdUrl);
         }
     }
 });
