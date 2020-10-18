@@ -49,8 +49,10 @@ var app = new Vue({
             .catch (error => {
                 //console.log(error.message);
                 if (error.message == '555') {
-                    console.log('Slug in use');
+                    // console.log('Slug in use');
                     this.error = "phrase already used";
+                } else {
+                    this.error = "something went wrong\nenter a full URL with http:// or https://";
                 }
             });
         }
