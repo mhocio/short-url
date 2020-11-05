@@ -10,7 +10,6 @@ require('dotenv').config();
 
 const db = monk(process.env.MONGODB_URI);
 const urls = db.get('urls');
-//urls.createIndex('slug');
 urls.createIndex({ slug: 1 }, { unique: true });
 
 const app = express();
@@ -34,16 +33,11 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('./public'));
 
-// app.get('/url/:id', (req, res) => {
-//     // TODO: get a short url by id
-// });
-
 app.get('/:id', async (req, res) => {
-    const { id:slug } = req.params;
+    const { id: slug } = req.params;
     try {
         const url = await urls.findOne({ slug });
         if (url) {
-            // urls.update({ id: url._id }, { clicks: url.clicks+1 });
             urls.update( 
                 { _id: url._id }, 
                 { $set: { clicks: url.clicks+1 }},
@@ -73,12 +67,6 @@ app.post('/url', async (req, res, next) => {
         if (!slug || slug == '') {
             slug = nanoid(5);
         } 
-        //else 
-        // {
-        //     const existing = await urls.findOne({ slug });
-        //     if (existing)
-        //         throw new Error('Slug in use.')
-        // }
         slug = slug.toLowerCase();
         await slugSchema.validate({ slug });
         const newUrl = {
@@ -107,7 +95,7 @@ app.use((error, req, res, next) => {
     res.json({
         message: error.message,
         stack: process.env.NODE_ENV === 'production' ? 'e' : error.stack,
-    })
+    });
 })
 
 const port = process.env.PORT || 7777;
