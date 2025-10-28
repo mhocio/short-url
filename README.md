@@ -26,6 +26,7 @@ npm run test:watch
 ```
 
 Tests require MongoDB. By default, they use a test database at `mongodb://localhost:27017/shorturl_test`.
+You can locally run it with `docker run --name mongodb-test -d -p 27017:27017 mongo:latest`
 You can override this by setting `MONGODB_URI` environment variable.
 
 <img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/mhocio/short-url/Node.js%20CI?style=flat-square"> <img alt="Website" src="https://img.shields.io/website?style=flat-square&url=http%3A%2F%2F1aa.xyz">
