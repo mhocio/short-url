@@ -16,14 +16,17 @@ jobs:
 
     services:
       mongodb:
-        image: mongo:4.4
+        image: mongo:6
         ports:
           - 27017:27017
+        env:
+          MONGO_INITDB_DATABASE: shorturl-test
         options: >-
-          --health-cmd "mongosh --eval 'db.runCommand({ ping: 1 })'"
+          --health-cmd mongosh
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+          --health-start-period 20s
 
     strategy:
       matrix:
@@ -51,5 +54,13 @@ jobs:
       - name: Build
         run: npm run build --if-present
 
+      - name: Verify MongoDB Connection
+        run: |
+          echo "Waiting for MongoDB to be ready..."
+          timeout 30 bash -c 'until mongosh --eval "db.runCommand({ ping: 1 })"; do sleep 2; done'
+          echo "MongoDB is ready!"
+
       - name: Run tests
         run: npm test --if-present
+        env:
+          MONGODB_URI: mongodb://localhost:27017/shorturl-test
