@@ -54,10 +54,19 @@ jobs:
       - name: Build
         run: npm run build --if-present
 
+      - name: Install MongoDB Shell
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget gnupg
+          wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add -
+          echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+          sudo apt-get update
+          sudo apt-get install -y mongodb-mongosh
+
       - name: Verify MongoDB Connection
         run: |
           echo "Waiting for MongoDB to be ready..."
-          timeout 30 bash -c 'until mongosh --eval "db.runCommand({ ping: 1 })"; do sleep 2; done'
+          timeout 30 bash -c 'until mongosh --eval "db.runCommand({ ping: 1 })" --quiet localhost:27017/shorturl-test; do sleep 2; done'
           echo "MongoDB is ready!"
 
       - name: Run tests
