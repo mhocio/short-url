@@ -4,7 +4,19 @@ const morgan = require('morgan');
 const helmet = require('helmet');
 const yup = require('yup');
 const monk =  require('monk');
-const { nanoid } = require('nanoid');
+const crypto = require('crypto');
+
+// Small internal slug generator to avoid ESM-only nanoid issues in CommonJS tests.
+// Uses a URL-safe alphabet (lowercase letters, digits, underscore and hyphen).
+function generateSlug(size = 5) {
+    const alphabet = 'abcdefghijklmnopqrstuvwxyz0123456789_-';
+    const bytes = crypto.randomBytes(size);
+    let id = '';
+    for (let i = 0; i < size; i++) {
+        id += alphabet[bytes[i] % alphabet.length];
+    }
+    return id;
+}
 
 require('dotenv').config();
 
@@ -20,16 +32,9 @@ const app = express();
 //app.use(helmet());
 //app.use(helmet.contentSecurityPolicy());
 
-app.use(helmet.dnsPrefetchControl());
-app.use(helmet.expectCt());
-app.use(helmet.frameguard());
-app.use(helmet.hidePoweredBy());
-app.use(helmet.hsts());
-app.use(helmet.ieNoOpen());
-app.use(helmet.noSniff());
-app.use(helmet.permittedCrossDomainPolicies());
-app.use(helmet.referrerPolicy());
-app.use(helmet.xssFilter());
+// Use helmet's default security headers. Calling individual feature
+// methods can fail across helmet major versions (some helpers were removed).
+app.use(helmet());
 
 app.use(morgan('tiny'));
 app.use(cors());
@@ -70,8 +75,8 @@ app.post('/url', async (req, res, next) => {
         await urlSchema.validate({ url });
 
         if (!slug || slug == '') {
-            slug = nanoid(5);
-        } 
+            slug = generateSlug(5);
+        }
         slug = slug.toLowerCase();
         await slugSchema.validate({ slug });
         const newUrl = {
