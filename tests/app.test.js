@@ -13,8 +13,8 @@ const app = require('../index.js');
 // Increase timeout for all tests
 jest.setTimeout(30000);
 
-// Setup test database
-const testDbUri = 'mongodb://localhost:27017/shorturl_test';
+// Setup test database. Prefer CI-provided MONGODB_URI so tests and app use the same DB.
+const testDbUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/shorturl_test';
 const db = monk(testDbUri);
 const urls = db.get('urls');
 
