@@ -90,7 +90,8 @@ describe('POST /url', () => {
       url: 'https://example.com',
       clicks: 0
     });
-    expect(response.body.slug).toMatch(/^[a-z0-9]{5}$/); // nanoid(5) lowercase
+  // nanoid(5) uses URL-safe alphabet (may include "_" or "-"); server lowercases it
+  expect(response.body.slug).toMatch(/^[a-z0-9_-]{5}$/);
     expect(response.body).not.toHaveProperty('_id');
   });
 
