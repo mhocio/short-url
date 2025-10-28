@@ -1,0 +1,26 @@
+version: 2
+
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 5
+    # Only open PRs for direct and indirect deps
+    allow:
+      - dependency-type: "direct"
+      - dependency-type: "indirect"
+    labels:
+      - "dependencies"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "actions"
+
+# Optional: enable security-only mode for npm by adding 'security-updates: true' under the npm entry
+# Optional: configure reviewers/assignees for PRs by adding 'reviewers:' or 'assignees:' arrays
