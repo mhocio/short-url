@@ -111,6 +111,13 @@ app.use((error, req, res, next) => {
 })
 
 const port = process.env.PORT || 7777;
-app.listen(port, () => {
-    console.log(`Listening at http://localhost:${port}`);
-})
+
+// Create server but only start listening if this file is run directly
+if (require.main === module) {
+    app.listen(port, () => {
+        console.log(`Listening at http://localhost:${port}`);
+    });
+}
+
+// Export for testing
+module.exports = app;
