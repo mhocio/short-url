@@ -9,10 +9,12 @@ var app = new Vue({
         error: null,
     },
     methods: {
+        // Create a short URL by POSTing to /url.
+        // The server now returns standard HTTP status codes and a JSON error body.
         async createUrl() {
             this.createdUrl = null;
             this.error = null;
-            this.created= null;
+            this.created = null;
 
             if (!this.useCustomSlug) {
                 this.slug = '';
@@ -21,40 +23,33 @@ var app = new Vue({
             if (this.useCustomSlug && this.slug == '') {
                 this.useCustomSlug = false;
             }
-            
-            fetch('/url', {
-                method: 'POST',
-                headers: {
-                    'content-type': 'application/json',
-                },
-                body: JSON.stringify({
-                    url: this.url,
-                    slug: this.slug
-                })
-            })
-            .then((response) => {
-                //console.log(response);
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    throw new Error(response.status);
+
+            try {
+                const response = await fetch('/url', {
+                    method: 'POST',
+                    headers: { 'content-type': 'application/json' },
+                    body: JSON.stringify({ url: this.url, slug: this.slug })
+                });
+
+                if (!response.ok) {
+                    // Attempt to parse JSON error body from server.
+                    let body = null;
+                    try { body = await response.json(); } catch (e) { /* ignore parse errors */ }
+                    const message = body && body.message ? body.message : response.statusText || String(response.status);
+                    throw new Error(message);
                 }
-            })
-            .then (data => {
-                //console.log(data);
+
+                const data = await response.json();
                 this.created = data;
                 this.createdUrl = location.protocol + '//' + location.host + '/' + this.created.slug;
-                console.log(this.createdUrl);
-            })
-            .catch (error => {
-                //console.log(error.message);
-                if (error.message == '555') {
-                    // console.log('Slug in use');
+            } catch (error) {
+                // Server now returns 'Slug in use.' message for conflicts (HTTP 409).
+                if (error && error.message === 'Slug in use.') {
                     this.error = "phrase already used";
                 } else {
                     this.error = "something went wrong\nenter a full URL with http:// or https://";
                 }
-            });
+            }
         }
     }
 });

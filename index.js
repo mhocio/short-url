@@ -8,8 +8,11 @@ const { nanoid } = require('nanoid');
 
 require('dotenv').config();
 
-const db = monk(process.env.MONGODB_URI);
+// Database (monk) - single collection `urls` used across the app.
+// Expect MONGODB_URI in .env (see README.md).
+const db = monk(process.env.MONGODB_URI); // e.g., 'mongodb://localhost:27017/mydb'
 const urls = db.get('urls');
+// Ensure unique index on `slug` (used to detect duplicate slugs).
 urls.createIndex({ slug: 1 }, { unique: true });
 
 const app = express();
@@ -33,21 +36,22 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('./public'));
 
+// Redirect route: lookup by slug and redirect to the stored URL.
+// Also increments a simple `clicks` counter.
 app.get('/:id', async (req, res) => {
     const { id: slug } = req.params;
     try {
         const url = await urls.findOne({ slug });
         if (url) {
-            urls.update( 
-                { _id: url._id }, 
-                { $set: { clicks: url.clicks+1 }},
-                (err, result) => {}
-            )
-            res.redirect(url.url);
+            // Use async update (avoid callback) and tolerate missing clicks.
+            await urls.update({ _id: url._id }, { $set: { clicks: (url.clicks || 0) + 1 } });
+            return res.redirect(url.url);
         }
-        res.redirect(`/?error=${slug} not found`);
+        // Not found -> redirect user to UI with error query (UI displays it).
+        return res.redirect(`/?error=${encodeURIComponent(slug + ' not found')}`);
     } catch (error) {
-        res.redirect(`/?error=Link not found`);
+        // Unexpected errors: respond with 500 and a short message.
+        return res.status(500).send(error.message);
     }
 });
 
@@ -55,8 +59,9 @@ const urlSchema = yup.object().shape({
     url: yup.string().trim().url().required(),
 });
 
+// Slug must be one or more alphanumeric/underscore/dash characters.
 const slugSchema = yup.object().shape({
-    slug: yup.string().trim().matches(/[\w\-]/i),
+    slug: yup.string().trim().matches(/^[\w\-]+$/i),
 });
 
 app.post('/url', async (req, res, next) => {
@@ -78,23 +83,30 @@ app.post('/url', async (req, res, next) => {
         delete createdUrl._id;
         res.json(createdUrl);
     } catch (error) {
-        if (error.message.startsWith('E11000')) {
-            error.message = 'Slug in use.'
-            error.status = 555;
+        // Validation errors from yup -> 400 Bad Request
+        if (error.name === 'ValidationError') {
+            error.status = 400;
         }
+
+        // Duplicate key error from Mongo/monk -> 409 Conflict
+        // Mongo messages sometimes include 'E11000' or set `code === 11000`.
+        if (error && (error.message && error.message.indexOf('E11000') !== -1 || error.code === 11000)) {
+            error.message = 'Slug in use.';
+            error.status = 409;
+        }
+
         next(error);
     }
 });
 
 app.use((error, req, res, next) => {
-    if (error.status)
-        res.status(error.status);
-    else
-        res.status(500);
-    
+    // Set status (default 500)
+    res.status(error.status || 500);
+
+    // Return JSON error body. Avoid leaking stack in production.
     res.json({
         message: error.message,
-        stack: process.env.NODE_ENV === 'production' ? 'e' : error.stack,
+        stack: process.env.NODE_ENV === 'production' ? undefined : error.stack,
     });
 })
 
