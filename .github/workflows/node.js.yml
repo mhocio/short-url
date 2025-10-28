@@ -16,14 +16,13 @@ jobs:
 
     services:
       mongodb:
-        image: mongo:4.4
+        # use a recent stable MongoDB image
+        image: mongo:6
         ports:
           - 27017:27017
-        options: >-
-          --health-cmd "mongosh --eval 'db.runCommand({ ping: 1 })'"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+        # pre-create a predictable test DB
+        env:
+          MONGO_INITDB_DATABASE: shorturl-test
 
     strategy:
       matrix:
@@ -50,6 +49,13 @@ jobs:
 
       - name: Build
         run: npm run build --if-present
+
+      - name: Wait for MongoDB
+        run: |
+          echo "Waiting for MongoDB (localhost:27017) to accept connections..."
+          # wait up to 60s for the TCP port to be open
+          timeout 60 bash -c 'until (echo > /dev/tcp/127.0.0.1/27017) >/dev/null 2>&1; do sleep 1; done'
+          echo "MongoDB port is open."
 
       - name: Run tests
         run: npm test --if-present
