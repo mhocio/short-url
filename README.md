@@ -1,17 +1,21 @@
 # short-url
 
-Link to the application: http://1aa.xyz
+| Link to the application: https://z7z.pro | 
+<img alt="demo" src="https://img.shields.io/website?style=flat-square&url=http%3A%2F%2Fz7z.pro"> | 
+[![Node.js CI](https://github.com/mhocio/short-url/actions/workflows/node.js.yml/badge.svg)](https://github.com/mhocio/short-url/actions/workflows/node.js.yml) |
 
-node.js application with a connected MongoDB to shorten your URL
+-----
 
-Todos
+Node.js application with a connected MongoDB to shorten your URL
+
+## Todos
 - Add `.env.example` and `.env.test.example` for local setup.
 - Add rate limiting on `POST /url`.
 - Make slug length and retry attempts configurable via env.
 - Tighten CORS policy for production.
 - Pin CDN assets with versioned URLs and SRI hashes.
 
-# How to run locally
+## How to run locally
 - Create MongoDB database, for example on cloud via https://mongodb.com or locally
 - Create .env file
 - Add ```MONGODB_URI=url_to_your_database``` to .env file
@@ -36,4 +40,3 @@ Tests require MongoDB. By default, they use a test database at `mongodb://localh
 You can locally run it with `docker run --name mongodb-test -d -p 27017:27017 mongo:latest`
 You can override this by setting `MONGODB_URI` environment variable.
 
-<img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/mhocio/short-url/Node.js%20CI?style=flat-square"> <img alt="Website" src="https://img.shields.io/website?style=flat-square&url=http%3A%2F%2F1aa.xyz">
