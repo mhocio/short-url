@@ -32,9 +32,23 @@ const app = express();
 //app.use(helmet());
 //app.use(helmet.contentSecurityPolicy());
 
-// Use helmet's default security headers. Calling individual feature
-// methods can fail across helmet major versions (some helpers were removed).
-app.use(helmet());
+// Use helmet with a CSP that allows the CDN assets used by the UI.
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", "https://code.jquery.com", "https://cdn.jsdelivr.net"],
+            styleSrc: ["'self'", "https://cdn.jsdelivr.net"],
+            imgSrc: ["'self'", "data:"],
+            fontSrc: ["'self'", "https://cdn.jsdelivr.net"],
+            connectSrc: ["'self'"],
+            objectSrc: ["'none'"],
+            baseUri: ["'self'"],
+            formAction: ["'self'"],
+            frameAncestors: ["'none'"],
+        },
+    },
+}));
 
 app.use(morgan('tiny'));
 app.use(cors());
