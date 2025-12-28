@@ -132,23 +132,24 @@ describe('POST /url', () => {
 
 describe('GET /:id', () => {
   it('should redirect to stored URL and increment clicks', async () => {
+    const testSlugString = 'test-slug';
     // Create a URL first
-    const createResponse = await request(app)
+    await request(app)
       .post('/url')
       .send({
         url: 'https://example.com',
-        slug: 'test-slug'
+        slug: testSlugString
       });
 
     // Try to access it
     const response = await request(app)
-      .get('/test-slug')
+      .get(`/${testSlugString}`)
       .expect(302); // expect redirect
 
     expect(response.headers.location).toBe('https://example.com');
 
     // Verify clicks were incremented
-    const urlDoc = await urls.findOne({ slug: 'test-slug' });
+    const urlDoc = await urls.findOne({ slug: testSlugString });
     expect(urlDoc.clicks).toBe(1);
   });
 

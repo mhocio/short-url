@@ -74,19 +74,41 @@ app.post('/url', async (req, res, next) => {
     try {
         await urlSchema.validate({ url });
 
-        if (!slug || slug == '') {
-            slug = generateSlug(5);
+        const isCustomSlug = Boolean(slug && slug !== '');
+        const maxSlugAttempts = 5;
+        let attempts = 0;
+
+        while (attempts < maxSlugAttempts) {
+            if (!isCustomSlug) {
+                slug = generateSlug(5);
+            }
+
+            slug = slug.toLowerCase();
+            await slugSchema.validate({ slug });
+
+            const newUrl = {
+                url,
+                slug,
+                clicks: 0
+            };
+
+            try {
+                const createdUrl = await urls.insert(newUrl);
+                delete createdUrl._id;
+                return res.json(createdUrl);
+            } catch (error) {
+                // Retry only on duplicate slug and only for generated slugs.
+                if (!isCustomSlug && (error && (error.message && error.message.indexOf('E11000') !== -1 || error.code === 11000))) {
+                    attempts += 1;
+                    continue;
+                }
+                throw error;
+            }
         }
-        slug = slug.toLowerCase();
-        await slugSchema.validate({ slug });
-        const newUrl = {
-            url,
-            slug,
-            clicks: 0
-        }
-        const createdUrl = await urls.insert(newUrl);
-        delete createdUrl._id;
-        res.json(createdUrl);
+
+        const retryError = new Error('Failed to generate unique slug.');
+        retryError.status = 409;
+        throw retryError;
     } catch (error) {
         // Validation errors from yup -> 400 Bad Request
         if (error.name === 'ValidationError') {
