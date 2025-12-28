@@ -20,6 +20,11 @@ function generateSlug(size = 5) {
 
 require('dotenv').config();
 
+if (!process.env.MONGODB_URI) {
+    console.error('Missing MONGODB_URI. Set it in .env or your environment before starting the server.');
+    process.exit(1);
+}
+
 // Database (monk) - single collection `urls` used across the app.
 // Expect MONGODB_URI in .env (see README.md).
 const db = monk(process.env.MONGODB_URI); // e.g., 'mongodb://localhost:27017/mydb'
