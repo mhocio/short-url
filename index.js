@@ -42,11 +42,11 @@ app.use(helmet({
     contentSecurityPolicy: {
         directives: {
             defaultSrc: ["'self'"],
-            scriptSrc: ["'self'", "https://code.jquery.com", "https://cdn.jsdelivr.net"],
+            scriptSrc: ["'self'", "'unsafe-eval'", "https://code.jquery.com", "https://cdn.jsdelivr.net"],
             styleSrc: ["'self'", "https://cdn.jsdelivr.net"],
             imgSrc: ["'self'", "data:"],
             fontSrc: ["'self'", "https://cdn.jsdelivr.net"],
-            connectSrc: ["'self'"],
+            connectSrc: ["'self'", "https://cdn.jsdelivr.net"],
             objectSrc: ["'none'"],
             baseUri: ["'self'"],
             formAction: ["'self'"],
