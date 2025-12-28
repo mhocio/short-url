@@ -4,6 +4,13 @@ Link to the application: http://1aa.xyz
 
 node.js application with a connected MongoDB to shorten your URL
 
+Todos
+- Add `.env.example` and `.env.test.example` for local setup.
+- Add rate limiting on `POST /url`.
+- Make slug length and retry attempts configurable via env.
+- Tighten CORS policy for production.
+- Pin CDN assets with versioned URLs and SRI hashes.
+
 # How to run locally
 - Create MongoDB database, for example on cloud via https://mongodb.com or locally
 - Create .env file
